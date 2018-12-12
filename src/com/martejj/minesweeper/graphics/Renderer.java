@@ -107,6 +107,39 @@ public class Renderer {
 
     }
 
+    /**
+     * Draws a filled rectangle
+     * @param width of the rectangle
+     * @param height of the rectangle
+     * @param x of the centre of the rectangle
+     * @param y of the centre of the rectangle
+     * @param colour RGB colour value
+     * @param angle rotation in radians in the x-y plane anticlockwise
+     */
+
+    public void drawRectangle(double width, double height, double x, double y, Texture texture, double angle) {
+
+        // pushTransform(new Matrix4f().identity().scale(x, y, 1));
+        Matrix4f projection = new Matrix4f()
+                .ortho2D((float) -x, (float) (this.getInitialWidth() - x), (float) -y, (float) (this.getInitialHeight() - y));
+
+        // Need to divide by two as we scale by this number in both up and down and left and right directions
+        Matrix4f scale = new Matrix4f().scaling((float) width/2, (float) height/2, 1);
+
+        Matrix4f rotation = new Matrix4f().rotation(new AxisAngle4f().rotate((float) angle));
+
+        shader.bind();
+
+        setUniforms(shader, projection, scale, rotation);
+
+        rectangle.setTexture(texture);
+
+        rectangle.render();
+
+        rectangle.setTexture(null);
+
+    }
+
     public void drawModel(double width, double height, double x, double y, Colour colour, double angle, Model model) {
 
         Matrix4f projection = new Matrix4f()
@@ -117,6 +150,31 @@ public class Renderer {
         Matrix4f rotation = new Matrix4f().rotation(new AxisAngle4f().rotate((float) angle));
 
         setUniforms(shader, colour, projection, scale, rotation);
+
+        model.render();
+
+    }
+
+    /**
+     *
+     * @param width - horizontal scaling of the model
+     * @param height - vertical scaling of the model
+     * @param x
+     * @param y
+     * @param angle
+     * @param model - model which may be textured
+     */
+
+    public void drawModel(double width, double height, double x, double y, double angle, Model model) {
+
+        Matrix4f projection = new Matrix4f()
+                .ortho2D((float) -x, (float) (this.getInitialWidth() - x), (float) -y, (float) (this.getInitialHeight() - y));
+
+        Matrix4f scale = new Matrix4f().scaling((float) width, (float) height, 1);
+
+        Matrix4f rotation = new Matrix4f().rotation(new AxisAngle4f().rotate((float) angle));
+
+        setUniforms(shader, new Colour(1.0f, 1.0f, 1.0f), projection, scale, rotation);
 
         model.render();
 
@@ -141,6 +199,16 @@ public class Renderer {
         shader.bind();
 
         shader.setColour(colour);
+
+        shader.setUniform("projection", projection);
+        shader.setUniform("scale", scale);
+        shader.setUniform("rotation", rotation);
+
+    }
+
+    public void setUniforms(Shader shader, Matrix4f projection, Matrix4f scale, Matrix4f rotation) {
+
+        shader.bind();
 
         shader.setUniform("projection", projection);
         shader.setUniform("scale", scale);

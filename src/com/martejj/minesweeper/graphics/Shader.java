@@ -15,6 +15,9 @@ import static org.lwjgl.opengl.GL20.*;
 
 public class Shader {
 
+    public static final int VERTICES_ID = 0;
+    public static final int TEXTURES_ID = 1;
+
     private int program; // OpenGL binding for this shader
     private int vs; // Describes shape
     private int fs; // Describes colour
@@ -55,8 +58,10 @@ public class Shader {
         glAttachShader(program, vs);
         glAttachShader(program, fs);
 
-        // We only ever link the initial vertices once. Afterwards we use the projeciton uniform to scale/transform/rotate it
-        glBindAttribLocation(program, 0, "vertices");
+        // We only ever link the initial vertices once. Afterwards we use the projection uniform to scale/transform/rotate it
+        glBindAttribLocation(program, VERTICES_ID, "vertices");
+
+        glBindAttribLocation(program, TEXTURES_ID, "textures");
 
         glLinkProgram(program);
 
