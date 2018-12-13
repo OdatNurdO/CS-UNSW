@@ -12,6 +12,7 @@ import java.nio.IntBuffer;
 import java.util.Stack;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.system.MemoryStack.*;
 
 public class Renderer {
@@ -254,6 +255,32 @@ public class Renderer {
     public void popTransform() {
 
         currentTransformation.mul(transformStack.pop().invert());
+
+    }
+
+    public static Model createQuadModel() {
+
+        float[] vertices = {
+                -1f,   1f,   0, // TOP LEFT
+                1f,   1f,   0, // TOP RIGHT
+                1f,  -1f,   0, // BOTTOM RIGHT
+                -1f,  -1f,   0  // BOTTOM LEFT
+        };
+
+        int[] indices = {
+                0,  1,  2,
+                0,  2,  3
+        };
+
+        // Opposite order as texcoords are 0,0 at top left
+        float[] texcoords = {
+                0f, 0f,
+                1f, 0f,
+                1f, 1f,
+                0f, 1f,
+        };
+
+        return new Model(vertices, indices, texcoords, GL_TRIANGLES);
 
     }
 

@@ -24,36 +24,13 @@ public class Game {
 
     public void init() {
 
-        map = new Map(8, 8, 0.1, 13);
+        renderer = new Renderer(canvas);
 
-        float[] vertices = {
-                -1f,   1f,   0, // TOP LEFT
-                1f,   1f,   0, // TOP RIGHT
-                1f,  -1f,   0, // BOTTOM RIGHT
-                -1f,  -1f,   0  // BOTTOM LEFT
-        };
-
-        int[] indices = {
-                0,  1,  2,
-                0,  2,  3
-        };
-
-        float[] texcoords = {
-                0f, 1f,
-                1f, 1f,
-                1f, 0f,
-                0f, 0f
-        };
-
-        model = new Model(vertices, indices, texcoords, GL_TRIANGLES);
-
-        model.setTexture(new Texture("water"));
+        map = new Map(17, 9, 0.1, 13, this);
 
     }
 
     public void run() {
-
-        renderer = new Renderer(canvas);
 
         while (canvas.preRender()) {
 
@@ -76,9 +53,9 @@ public class Game {
 
     public void render() {
 
-        renderer.shader.setUniform("sampler", 0);
-        renderer.drawModel(100, 100, 110, 100, 0, model);
-
+        //renderer.shader.setUniform("sampler", 0);
+        //renderer.drawModel(100, 100, 110, 100, 0, model);
+        map.render(renderer);
         //model.render();
 
         //renderer.drawRectangle(100, 100, 60, 60, Colour.RED, 0);

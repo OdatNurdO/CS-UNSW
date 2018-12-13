@@ -1,5 +1,6 @@
 package com.martejj.minesweeper.map;
 
+import com.martejj.minesweeper.Game;
 import com.martejj.minesweeper.graphics.Model;
 import com.martejj.minesweeper.graphics.Renderer;
 import com.martejj.minesweeper.graphics.Texture;
@@ -12,6 +13,8 @@ import org.lwjgl.opengl.GL11;
 
 public class Map {
 
+    public static final int MAX_NEIGHBOUR_MINES = 8;
+
     boolean[][] isVisible, isMine, isFlagged;
 
     int[][] numAdjacentMines;
@@ -20,9 +23,21 @@ public class Map {
 
     double difficulty;
 
-    Model square;
+    public static final int margin = 50;
 
-    public Map(int xSize, int ySize, double difficulty, int seed) {
+    int ySceneSize, xSceneSize;
+
+    double tileSize;
+
+    Game game;
+
+    Model[] tileModels;
+
+    Model flagModel;
+
+    public Map(int xSize, int ySize, double difficulty, int seed, Game game) {
+
+        this.game = game;
 
         this.difficulty = difficulty;
 
@@ -37,24 +52,53 @@ public class Map {
 
         generateMap(seed);
 
-        /*float[] vertices = {
-                -1f,   1f,   0, // TOP LEFT
-                1f,   1f,   0, // TOP RIGHT
-                1f,  -1f,   0, // BOTTOM RIGHT
-                -1f,  -1f,   0  // BOTTOM LEFT
-        };
+        ySceneSize = game.getInitialHeight() - margin*2;
+        xSceneSize = game.getInitialWidth() - margin*2;
 
-        int[] indices = {
-                0,  1,  2,
-                0,  2,  3
-        };
+        double yTileSize = ySceneSize/ySize;
+        double xTileSize = xSceneSize/xSize;
 
-        this.square = new Model(vertices, indices, GL11.GL_TRIANGLES);
-        this.square.setTexture(new Texture("water"));*/
+        // Set it to the smaller of the tiles
+
+        tileSize = (yTileSize < xTileSize ? yTileSize : xTileSize);
+
+        // Load tile textures
+        tileModels = new Model[MAX_NEIGHBOUR_MINES];
+
+        for (int i = 0; i < MAX_NEIGHBOUR_MINES; i++) {
+
+            tileModels[i] = Renderer.createQuadModel();
+            tileModels[i].setTexture(new Texture(Integer.toString(i)));
+
+        }
+
+        flagModel = Renderer.createQuadModel();
+        flagModel.setTexture(new Texture("flag"));
 
     }
 
     public void render(Renderer renderer) {
+
+        for (int y = 0; y < ySize; y++) {
+
+            for (int x = 0; x < xSize; x++) {
+
+                Model model;
+
+                if (!isVisible[x][y] && !isFlagged[x][y]) {
+                    model = tileModels[0];
+                } else if (isFlagged[x][y]) {
+                    model = flagModel;
+                } else if (isVisible[x][y] && !isMine[x][y]){
+                    model = tileModels[numAdjacentMines[x][y]];
+                } else {
+                    model = tileModels[0];
+                }
+
+                renderer.drawModel(tileSize/2, tileSize/2, getX(x), getY(y), 0, model);
+            }
+
+        }
 
         //renderer.drawModel(64, 64, 400, 400, 0, this.square);
 
@@ -147,6 +191,18 @@ public class Map {
         cascadeVisibility(x - 1, y, dst);
         cascadeVisibility(x, y + 1, dst);
         cascadeVisibility(x, y - 1, dst);
+
+    }
+
+    public double getX(int x) {
+
+        return x*tileSize + margin;
+
+    }
+
+    public double getY(int y) {
+
+        return y*tileSize + margin;
 
     }
 
