@@ -1,5 +1,6 @@
 package com.martejj.minesweeper.graphics;
 
+import com.martejj.minesweeper.input.InputHandler;
 import org.lwjgl.Version;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
@@ -11,6 +12,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Canvas {
+
     // The window handle
     private long window;
 
@@ -22,7 +24,7 @@ public class Canvas {
 
     public Canvas() {
 
-        System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+        System.out.println("LWJGL: " + Version.getVersion());
 
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -41,14 +43,8 @@ public class Canvas {
         window = glfwCreateWindow(width, height, "LWJGL Physics", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
-/*
-        // Setup a key callback. It will be called every time a key is pressed, repeated or released.
-        glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
-            if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE )
-                glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-        }); */
 
-        glfwSetWindowPos(window, 40,40);
+        glfwSetWindowPos(window, startX, startY);
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window);
@@ -67,6 +63,9 @@ public class Canvas {
 
         // Set the clear color
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // Setup input handler
+        InputHandler.setupHandler(window);
 
     }
 
@@ -107,10 +106,6 @@ public class Canvas {
     public void postRender() {
 
         glfwSwapBuffers(window); // swap the color buffers
-
-        // Poll for window events. The key callback above will only be
-        // invoked during this call.
-        glfwPollEvents();
 
     }
 

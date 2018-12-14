@@ -9,7 +9,8 @@ import java.util.Random;
 
 import java.lang.Math;
 
-import org.lwjgl.opengl.GL11;
+import com.martejj.minesweeper.input.InputHandler;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class Map {
 
@@ -23,9 +24,9 @@ public class Map {
 
     double difficulty;
 
-    public static final int margin = 50;
+    public static final double margin = 50;
 
-    int ySceneSize, xSceneSize;
+    double ySceneSize, xSceneSize;
 
     double tileSize;
 
@@ -100,7 +101,15 @@ public class Map {
 
         }
 
-        //renderer.drawModel(64, 64, 400, 400, 0, this.square);
+    }
+
+    public void update() {
+
+        if (InputHandler.getButtonState(GLFW_MOUSE_BUTTON_LEFT) == InputHandler.BUTTON_RELEASE) {
+            cascadeVisibility(screenCoordsToTileCoords(InputHandler.getMouseX()), screenCoordsToTileCoords(InputHandler.getMouseY()), 0);
+        } else if (InputHandler.getButtonState(GLFW_MOUSE_BUTTON_RIGHT) == InputHandler.BUTTON_RELEASE) {
+
+        }
 
     }
 
@@ -187,11 +196,20 @@ public class Map {
         // Set this visibility
         isVisible[x][y] = true;
 
+        // Recursively cascade visibility
         cascadeVisibility(x + 1, y, dst);
         cascadeVisibility(x - 1, y, dst);
         cascadeVisibility(x, y + 1, dst);
         cascadeVisibility(x, y - 1, dst);
 
+    }
+
+    public double tileCoordsToScreenCoords(int tileCoord) {
+        return tileCoord*tileSize + margin;
+    }
+
+    public int screenCoordsToTileCoords(double screenCoord) {
+        return (int) ((screenCoord - margin)/tileSize);
     }
 
     public double getX(int x) {

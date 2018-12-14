@@ -1,10 +1,10 @@
 package com.martejj.minesweeper;
 
 import com.martejj.minesweeper.graphics.*;
+import com.martejj.minesweeper.input.InputHandler;
 import com.martejj.minesweeper.map.Map;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class Game {
 
@@ -13,8 +13,6 @@ public class Game {
     private Renderer renderer;
 
     Map map;
-
-    private double mouseX, mouseY;
 
     public Game() {
 
@@ -46,20 +44,18 @@ public class Game {
 
     public void update() {
 
-    }
+        InputHandler.update();
 
-    Texture texture;
-    Model model;
+        if (InputHandler.getKeyState(GLFW_KEY_ESCAPE) == InputHandler.KEY_RELEASE)
+            glfwSetWindowShouldClose (getWindow(), true);
+
+        map.update();
+
+    }
 
     public void render() {
 
-        //renderer.shader.setUniform("sampler", 0);
-        //renderer.drawModel(100, 100, 110, 100, 0, model);
         map.render(renderer);
-        //model.render();
-
-        //renderer.drawRectangle(100, 100, 60, 60, Colour.RED, 0);
-        //map.render(renderer);
 
     }
 
@@ -88,18 +84,6 @@ public class Game {
     public long getWindow() {
 
         return this.canvas.getWindow();
-
-    }
-
-    public double getMouseX() {
-
-        return mouseX;
-
-    }
-
-    public double getMouseY() {
-
-        return mouseY;
 
     }
 
